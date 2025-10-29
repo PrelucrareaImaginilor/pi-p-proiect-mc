@@ -10,7 +10,7 @@
 | **K. A. Muhaba et al., 2021** | Automatic skin disease diagnosis using deep learning from clinical image and patient information | Model deep learning MobileNet V2 pre-antrenat; imagini + date clinice | Achiziție imagini (286 pacienți) + metadate clinice; augmentare; antrenare MobileNet V2 pentru clasificare a 5 boli cutanate | Date dintr-un singur set; lipsă diversitate; dependență de meta-date | Acuratețe 97.5%; Sensibilitate 97.7%; Precizie 97.7% | Util în medii cu resurse reduse; combinația imagini + date clinice e foarte eficientă |
 
 
-![Schema Bloc](images/SchemaPI.drawio.png)
+![Schema Bloc](SchemaPI.drawio.png)
 
 ##  Etape ale proiectului
 
