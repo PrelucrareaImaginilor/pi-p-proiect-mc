@@ -21,9 +21,9 @@ def main():
                         "dx": cls
                     })
 
-    print("Total imagini găsite:", len(images))
+    print("Total imagini gasite:", len(images))
     if len(images) == 0:
-        print("Nu am găsit nicio imagine. Verifică folderul sample_images!")
+        print("Nu am găsit nicio imagine.")
         return
 
     train_val, test = train_test_split(images, test_size=4, stratify=[x["dx"] for x in images], random_state=42)
@@ -40,7 +40,7 @@ def main():
             dst = os.path.join(OUTPUT_DIR, split_name, img["dx"], os.path.basename(img["image_path"]))
             shutil.copy2(img["image_path"], dst)
 
-    print("\n✅ Imaginile au fost împărțite și copiate în folderul splits:")
+    print("\n Imaginile au fost împărțite si copiate în folderul splits:")
     for split_name in splits:
         print(f"  - {split_name}: {len(splits[split_name])} imagini")
 if __name__ == "__main__":
