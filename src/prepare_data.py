@@ -1,6 +1,5 @@
 import os
 import shutil
-import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
@@ -26,8 +25,8 @@ def main():
         print("Nu am găsit nicio imagine.")
         return
 
-    train_val, test = train_test_split(images, test_size=4, stratify=[x["dx"] for x in images], random_state=42)
-    train, val = train_test_split(train_val, test_size=4, stratify=[x["dx"] for x in train_val], random_state=42)
+    train_val, test = train_test_split(images, test_size=0.2, stratify=[x["dx"] for x in images], random_state=42)
+    train, val = train_test_split(train_val, test_size=0.1, stratify=[x["dx"] for x in train_val], random_state=42)
 
     splits = {"train": train, "val": val, "test": test}
 
