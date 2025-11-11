@@ -45,6 +45,6 @@ if __name__ == '__main__':
     plt.axis("off")
 
 
-    print("test2")
+    print("test3")
     plt.tight_layout()
     plt.show()
