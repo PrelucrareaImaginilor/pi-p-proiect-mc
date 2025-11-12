@@ -44,5 +44,7 @@ if __name__ == '__main__':
     plt.title("Preprocesata (Fara zgomot)")
     plt.axis("off")
 
+
+    print("test3")
     plt.tight_layout()
     plt.show()
