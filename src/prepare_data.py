@@ -1,46 +1,72 @@
 import os
 import shutil
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
+# HAM10000 pe D:
+IMAGES_DIR_1 = r"D:\HAM10000\HAM10000_images_part_1"
+IMAGES_DIR_2 = r"D:\HAM10000\HAM10000_images_part_2"
+CSV_PATH = r"D:\HAM10000\HAM10000_metadata.csv"
 
-IMAGES_DIR="../data/sample_images"
-OUTPUT_DIR="../data/splits"
+# OUTPUT rămâne în proiectul PyCharm
+OUTPUT_DIR = "../data/splits"
 
-CLASSES=["acne","eczema","psoriasis","melanoma"]
+# 4 clase selectate
+CLASSES = ["mel", "nv", "bcc", "bkl"]
+
+def find_image(image_id):
+    for folder in [IMAGES_DIR_1, IMAGES_DIR_2]:
+        path = os.path.join(folder, image_id + ".jpg")
+        if os.path.exists(path):
+            return path
+    return None
 
 def main():
+    df = pd.read_csv(CSV_PATH)
+    df = df[df["dx"].isin(CLASSES)]
+
     images = []
-    for cls in CLASSES:
-        cls_path = os.path.join(IMAGES_DIR, cls)
-        if os.path.exists(cls_path):
-            for img_file in os.listdir(cls_path):
-                if img_file.lower().endswith(".jpg"):
-                    images.append({
-                        "image_path": os.path.join(cls_path, img_file),
-                        "dx": cls
-                    })
+    for _, row in df.iterrows():
+        img_path = find_image(row["image_id"])
+        if img_path:
+            images.append({
+                "image_path": img_path,
+                "dx": row["dx"]
+            })
 
-    print("Total imagini gasite:", len(images))
-    if len(images) == 0:
-        print("Nu am găsit nicio imagine.")
-        return
+    print("Total imagini:", len(images))
 
-    train_val, test = train_test_split(images, test_size=0.2, stratify=[x["dx"] for x in images], random_state=42)
-    train, val = train_test_split(train_val, test_size=0.1, stratify=[x["dx"] for x in train_val], random_state=42)
+    train_val, test = train_test_split(
+        images,
+        test_size=0.2,
+        stratify=[x["dx"] for x in images],
+        random_state=42
+    )
+
+    train, val = train_test_split(
+        train_val,
+        test_size=0.1,
+        stratify=[x["dx"] for x in train_val],
+        random_state=42
+    )
 
     splits = {"train": train, "val": val, "test": test}
 
     for split_name, split_images in splits.items():
         for cls in CLASSES:
-            out_cls_dir = os.path.join(OUTPUT_DIR, split_name, cls)
-            os.makedirs(out_cls_dir, exist_ok=True)
+            os.makedirs(os.path.join(OUTPUT_DIR, split_name, cls), exist_ok=True)
 
         for img in split_images:
-            dst = os.path.join(OUTPUT_DIR, split_name, img["dx"], os.path.basename(img["image_path"]))
+            dst = os.path.join(
+                OUTPUT_DIR,
+                split_name,
+                img["dx"],
+                os.path.basename(img["image_path"])
+            )
             shutil.copy2(img["image_path"], dst)
 
-    print("\n Imaginile au fost împărțite si copiate în folderul splits:")
-    for split_name in splits:
-        print(f"  - {split_name}: {len(splits[split_name])} imagini")
+    for split in splits:
+        print(f"{split}: {len(splits[split])} imagini")
+
 if __name__ == "__main__":
     main()

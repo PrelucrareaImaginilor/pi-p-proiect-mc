@@ -4,8 +4,8 @@ from tensorflow.keras.preprocessing import image
 import os
 
 MODEL_PATH = "../model.keras"
-IMG_SIZE = (128, 128)
-CLASSES = ["acne", "eczema", "psoriasis", "melanoma"]
+IMG_SIZE = (224,224)
+CLASSES = ["bcc", "bkl", "mel", "nv"]
 
 model = load_model(MODEL_PATH)
 print("Model încărcat:", MODEL_PATH)
@@ -15,7 +15,7 @@ def predict_image(img_path):
         print("Fisierul nu exista:", img_path)
         return
 
-    img = image.load_img(img_path, target_size=IMG_SIZE, color_mode="grayscale")
+    img = image.load_img(img_path, target_size=IMG_SIZE, color_mode="rgb")
     img_array = image.img_to_array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
     pred = model.predict(img_array)

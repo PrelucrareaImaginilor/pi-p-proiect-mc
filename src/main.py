@@ -6,8 +6,9 @@ from tensorflow.keras.preprocessing import image
 
 # Calea către modelul deja antrenat
 MODEL_PATH = "../model.keras"
-IMG_SIZE = (128, 128)
-CLASSES = ["acne", "eczema", "psoriasis", "melanoma"]
+IMG_SIZE = (224, 224)
+CLASSES = ["mel", "nv", "bcc", "bkl"]
+color_mode="rgb"
 
 # Încarcă modelul o singură dată
 model = load_model(MODEL_PATH)
