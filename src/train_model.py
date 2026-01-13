@@ -14,7 +14,7 @@ from tensorflow.keras.layers import GlobalAveragePooling2D
 DATA_DIR = "../data/splits"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 16
-EPOCHS = 1
+EPOCHS = 10
 CLASSES = ["mel", "nv", "bcc", "bkl"]
 
 # Generatoare de date
@@ -68,14 +68,14 @@ print("Class weights:", class_weights)
 #    Dense(len(CLASSES), activation="softmax")
 #])
 
-# Model de bază pre-antrenat
+# Model de baza pre-antrenat
 base_model = MobileNetV2(
     input_shape=(IMG_SIZE[0], IMG_SIZE[1], 3),
     include_top=False,
     weights="imagenet"
 )
 
-# Înghețăm straturile de bază
+# Inghetam straturile de bază
 base_model.trainable = False
 
 # Construim modelul final

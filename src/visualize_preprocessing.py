@@ -1,62 +1,55 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow.keras.preprocessing import image
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.models import load_model, Model
-from tensorflow.keras import Input
-import os
+import numpy as np
 
-
+IMG_SIZE = (224, 224)
 MODEL_PATH = "../model.keras"
-IMG_SIZE = (128, 128)
-CLASSES = ["acne", "eczema", "psoriasis", "melanoma"]
+IMG_PATH = "../data/splits/train/mel/ISIC_0024310.jpg"  # modifică imaginea
 
+# ===========================
+# 1. Încarcă imaginea
+# ===========================
+img = load_img(IMG_PATH, target_size=IMG_SIZE)
+img_array = img_to_array(img)
+img_prepared = np.expand_dims(img_array, axis=0) / 255.0
 
-img_path = "../data/sample_images/acne/acne2.jpg"
-if not os.path.exists(img_path):
-    print("Imaginea nu exista:", img_path)
-    exit()
-
-
+# ===========================
+# 2. Încărcare model
+# ===========================
 model = load_model(MODEL_PATH)
-print("Model încarcat:", MODEL_PATH)
 
+# accesăm primul strat Conv2D din MobileNetV2
+base_model = model.layers[0]  # MobileNetV2
+conv_layers = [layer for layer in base_model.layers if "conv" in layer.name.lower()]
 
-orig_img = image.load_img(img_path)
-preproc_img = image.load_img(img_path, target_size=IMG_SIZE, color_mode="grayscale")
-preproc_array = image.img_to_array(preproc_img) / 255.0
-img_array_batch = np.expand_dims(preproc_array, axis=0)  # [1,128,128,1]
+if not conv_layers:
+    raise ValueError("Nu am găsit straturi Conv2D în MobileNetV2!")
 
+first_conv_layer = conv_layers[0]
+print("Primul strat Conv2D:", first_conv_layer.name)
 
-input_tensor = Input(shape=(128,128,1))
-first_conv_output = model.layers[0](input_tensor)
-activation_model = Model(inputs=input_tensor, outputs=first_conv_output)
+# model pentru activări
+activation_model = Model(inputs=base_model.input, outputs=first_conv_layer.output)
 
+# ===========================
+# 3. Generăm activările
+# ===========================
+activations = activation_model.predict(img_prepared)
 
-activations = activation_model.predict(img_array_batch)
-first_layer_activation = activations  # [1, H, W, num_filters]
+# activările au forma (1, H, W, num_filters)
+num_filters = activations.shape[-1]
 
+# ===========================
+# 4. Afișăm primele 6 activări
+# ===========================
+plt.figure(figsize=(15, 10))
 
-plt.figure(figsize=(16,6))
-
-# 1. Imagine originala
-plt.subplot(2,4,1)
-plt.imshow(orig_img)
-plt.title("Originala")
-plt.axis("off")
-
-# 2. Imagine preprocesata (grayscale)
-plt.subplot(2,4,2)
-plt.imshow(preproc_array.squeeze(), cmap="gray")
-plt.title("Preprocesata")
-plt.axis("off")
-
-# 3-5. Primele 3 feature maps
-num_filters_to_show = min(3, first_layer_activation.shape[-1])
-for i in range(num_filters_to_show):
-    plt.subplot(2,4,i+3)
-    plt.imshow(first_layer_activation[0,:,:,i], cmap='viridis')
-    plt.title(f"Filter {i+1}")
-    plt.axis('off')
+for i in range(6):
+    ax = plt.subplot(2, 3, i+1)
+    plt.imshow(activations[0, :, :, i], cmap='viridis')
+    plt.title(f"Activare {i+1}")
+    plt.axis("off")
 
 plt.tight_layout()
 plt.show()
